@@ -15,3 +15,66 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Fix dasiyui color theme not working on tailwind/typo */
+*, :before, :after, [data-theme] {
+  color: hsla(var(--bc) / var(--tw-text-opacity, 1))!important;
+}
+
+.prose a img, .prose p img {
+  margin: 0;
+  display: inline-block;
+}
+
+/* Make modal(zIndex: 1000000002) on top of octo-tree(zIndex: 1000000001) */
+.modal {
+  z-index: 1000000002;
+}
+
+/* Static modal height as max-height */
+.modal-box {
+  height: calc(100vh - 5em);
+}
+
+.gg-spinner {
+  transform: scale(var(--ggs,1));
+  color: hsl(var(--p));
+}
+.gg-spinner,
+.gg-spinner::after,
+.gg-spinner::before {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px
+}
+.gg-spinner::after,
+.gg-spinner::before {
+  content: "";
+  position: absolute;
+  border-radius: 100px
+}
+.gg-spinner::before {
+  animation: spinner 1s
+  cubic-bezier(.6,0,.4,1) infinite;
+  border: 3px solid transparent;
+  border-top-color: currentColor
+}
+.gg-spinner::after {
+  border: 3px solid;
+  opacity: .2
+}
+@keyframes spinner {
+  0% { transform: rotate(0deg) }
+  to { transform: rotate(359deg) }
+}
+
+/* Hide scroll bar */
+::-webkit-scrollbar {
+  width: 0px;  /* Remove scrollbar space */
+  background: transparent;  /* Optional: just make scrollbar invisible */
+}
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
