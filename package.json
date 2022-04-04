@@ -1,5 +1,6 @@
 {
-  "name": "repo-stack",
+  "name": "repo-stack.ext",
+  "displayName": "repo-stack",
   "version": "0.1.2",
   "description": "webext template powered by vite and react",
   "keywords": [

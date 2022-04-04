@@ -4,8 +4,7 @@
   "version": "0.1.2",
   "description": "webext template powered by vite and react",
   "browser_action": {
-    "default_icon": "./assets/icon-512.png",
-    "default_popup": "./dist/popup/index.html"
+    "default_icon": "./assets/icon-512.png"
   },
   "options_ui": {
     "page": "./dist/options/index.html",
