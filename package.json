@@ -1,25 +1,23 @@
 {
   "name": "repo-stack.ext",
   "displayName": "Repo Stack",
-  "version": "0.1.2",
-  "description": "webext template powered by vite and react",
+  "version": "0.0.1",
+  "description": "Display repo stack details",
   "keywords": [
-    "react",
+    "repo stack",
     "vite",
     "extension",
     "chrome",
-    "firefox",
-    "aiou",
-    "template"
+    "firefox"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/spring-catponents/webext-template",
+  "homepage": "https://github.com/JiangWeixian/repo-stack.ext",
   "repository": {
     "type": "git",
-    "url": "https://github.com/spring-catponents/webext-template"
+    "url": "https://github.com/JiangWeixian/repo-stack.ext"
   },
   "bugs": {
-    "url": "https://github.com/spring-catponents/webext-template/issues",
+    "url": "https://github.com/JiangWeixian/repo-stack.ext/issues",
     "email": "jiangweixian1994@gmail.com"
   },
   "author": "JW <jiangweixian1994@gmail.com> (https://twitter.com/jiangweixian)",
@@ -40,7 +38,6 @@
     "start:firefox": "web-ext run --source-dir ./extension --target=firefox-desktop",
     "clear": "rimraf extension/dist extension/manifest.json extension.*",
     "lint:fix": "eslint . --fix",
-    "ci:publish": "pnpx changeset publish",
     "ci:version": "pnpx changeset version",
     "prepare": "husky install"
   },
