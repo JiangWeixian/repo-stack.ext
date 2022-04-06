@@ -1,5 +1,5 @@
 import React from 'react'
 
 export const Logo = () => {
-  return <div>logo</div>
+  return <div>Repo Stack</div>
 }

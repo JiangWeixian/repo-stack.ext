@@ -13,7 +13,6 @@ import { md } from '~/logic/md'
 
 const useClickOutside = (ref: any, callback: any) => {
   const handleClick = (e: any) => {
-    console.log(e.target)
     if (ref.current && !ref.current.contains(e.target)) {
       callback()
     }
@@ -28,6 +27,7 @@ const useClickOutside = (ref: any, callback: any) => {
 
 /**
  * @todo group pkgs to dep and devdeps
+ * @todo support private repo(need github token)
  */
 export const App = () => {
   const modal = useRef<HTMLDivElement>(null)

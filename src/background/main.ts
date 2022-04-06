@@ -47,7 +47,6 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
 onMessage<FetchPkgDetailOptions, string>(REQUEST_NPM_DETAIL, async ({ data }) => {
   try {
     const tab = await browser.tabs.get(previousTabId)
-    console.log(tab, data?.name)
     if (!tab.id || !data?.name) {
       return {}
     }
