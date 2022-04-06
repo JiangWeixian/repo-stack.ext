@@ -1,31 +1,32 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Repo Stack",
   "version": "0.0.1",
   "description": "Display repo stack details",
-  "browser_action": {
+  "action": {
     "default_icon": "./assets/icon-512.png"
   },
   "options_ui": {
     "page": "./dist/options/index.html",
-    "open_in_tab": true,
-    "chrome_style": false
+    "open_in_tab": true
   },
   "background": {
-    "page": "./dist/background/index.html",
-    "persistent": false
+    "service_worker": "./dist/background/index.global.js"
   },
   "icons": {
     "16": "./assets/icon-512.png",
     "48": "./assets/icon-512.png",
     "128": "./assets/icon-512.png"
   },
-  "permissions": ["tabs", "activeTab", "http://*/", "https://*/"],
-  "content_scripts": [
+  "host_permissions": ["http://*/", "https://*/"],
+  "permissions": ["tabs", "activeTab", "webNavigation"],
+  "web_accessible_resources": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["./dist/contentScripts/index.global.js"]
+      "resources": ["dist/contentScripts/style.css"],
+      "matches": ["https://github.com/*"]
     }
   ],
-  "web_accessible_resources": ["dist/contentScripts/style.css"]
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' http://localhost:3303; object-src 'self' http://localhost:3303"
+  }
 }

@@ -9,10 +9,10 @@ browser.webNavigation.onCommitted.addListener(({ tabId, frameId, url }) => {
   if (isForbiddenUrl(url)) return
 
   // inject the latest scripts
-  browser.tabs
-    .executeScript(tabId, {
-      file: `${isFirefox ? '' : '.'}/dist/contentScripts/index.global.js`,
-      runAt: 'document_end',
+  browser.scripting
+    .executeScript({
+      files: [`${isFirefox ? '' : '.'}/dist/contentScripts/index.global.js`],
+      target: { tabId },
     })
     .catch((error) => console.error(error))
 })

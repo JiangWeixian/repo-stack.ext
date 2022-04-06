@@ -1,5 +1,4 @@
 import { defineConfig, UserConfig } from 'vite'
-import AutoImport from 'unplugin-auto-import/vite'
 import react from '@vitejs/plugin-react-refresh'
 import { r, port, isDev } from './scripts/utils'
 
@@ -15,14 +14,6 @@ export const sharedConfig: UserConfig = {
   },
   plugins: [
     react(),
-    AutoImport({
-      imports: [
-        {
-          'webextension-polyfill': [['default', 'browser']],
-        },
-      ],
-      dts: r('src/auto-imports.d.ts'),
-    }),
 
     // rewrite assets to use relative path
     {
@@ -59,7 +50,6 @@ export default defineConfig(({ command }) => {
       },
       rollupOptions: {
         input: {
-          background: r('src/background/index.html'),
           options: r('src/options/index.html'),
         },
       },

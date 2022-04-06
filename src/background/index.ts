@@ -1,3 +1,4 @@
+// FIXME: bundle fetch is not working
 import { sendMessage, onMessage } from 'webext-bridge'
 import { Tabs } from 'webextension-polyfill'
 
@@ -6,8 +7,8 @@ import { fetchPkgDetail, FetchPkgDetailOptions } from '~/logic/api'
 
 // only on dev mode
 if (import.meta.hot) {
-  // @ts-expect-error for background HMR
-  import('/@vite/client')
+  // TODO: fixme HMR not working
+  // import('/@vite/client')
   // load latest content script
   import('./contentScriptHMR')
 }
