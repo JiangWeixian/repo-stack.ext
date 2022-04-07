@@ -1,6 +1,6 @@
 // FIXME: bundle fetch is not working
 import { sendMessage, onMessage } from 'webext-bridge'
-import { Tabs } from 'webextension-polyfill'
+import browser, { Tabs } from 'webextension-polyfill'
 
 import { REQUEST_NPM_DETAIL, TOGGLE_MODAL } from '~/logic/constants'
 import { fetchPkgDetail, FetchPkgDetailOptions } from '~/logic/api'
@@ -75,7 +75,8 @@ onMessage('get-current-tab', async () => {
 /**
  * Reaction on click popup icon
  */
-browser.browserAction.onClicked.addListener(async (tab) => {
+browser.action.onClicked.addListener(async (tab) => {
+  console.log(tab)
   if (!tab.id) {
     return
   }

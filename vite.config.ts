@@ -1,5 +1,6 @@
 import { defineConfig, UserConfig } from 'vite'
 import react from '@vitejs/plugin-react-refresh'
+import AutoImport from 'unplugin-auto-import/vite'
 import { r, port, isDev } from './scripts/utils'
 
 export const sharedConfig: UserConfig = {
@@ -14,6 +15,14 @@ export const sharedConfig: UserConfig = {
   },
   plugins: [
     react(),
+
+    AutoImport({
+      imports: [
+        {
+          'webextension-polyfill': [['default', 'browser']],
+        },
+      ],
+    }),
 
     // rewrite assets to use relative path
     {

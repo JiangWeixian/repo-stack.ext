@@ -19,7 +19,13 @@
     "128": "./assets/icon-512.png"
   },
   "host_permissions": ["http://*/", "https://*/"],
-  "permissions": ["tabs", "activeTab", "webNavigation"],
+  "permissions": ["tabs", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*"],
+      "js": ["./dist/contentScripts/index.global.js"]
+    }
+  ],
   "web_accessible_resources": [
     {
       "resources": ["dist/contentScripts/style.css"],
@@ -27,6 +33,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self' http://localhost:3303; object-src 'self' http://localhost:3303"
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }

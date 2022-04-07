@@ -32,7 +32,7 @@ export async function getManifest() {
     permissions: ['tabs', 'activeTab'],
     content_scripts: [
       {
-        matches: ['http://*/*', 'https://*/*'],
+        matches: ['https://github.com/*'],
         js: ['./dist/contentScripts/index.global.js'],
       },
     ],
