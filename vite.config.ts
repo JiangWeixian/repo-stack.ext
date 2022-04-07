@@ -19,7 +19,7 @@ export const sharedConfig: UserConfig = {
     AutoImport({
       imports: [
         {
-          'webextension-polyfill': [['default', 'browser']],
+          'webextension-polyfill': [['*', 'browser']],
         },
       ],
     }),
