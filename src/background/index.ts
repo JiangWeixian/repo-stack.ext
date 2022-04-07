@@ -1,16 +1,17 @@
 import { sendMessage, onMessage } from 'webext-bridge'
-import { Tabs } from 'webextension-polyfill'
+import browser, { Tabs } from 'webextension-polyfill'
 
 import { REQUEST_NPM_DETAIL, TOGGLE_MODAL } from '~/logic/constants'
 import { fetchPkgDetail, FetchPkgDetailOptions } from '~/logic/api'
 
+// FIXME: hmr not working on manifest v3
 // only on dev mode
-if (import.meta.hot) {
-  // @ts-expect-error for background HMR
-  import('/@vite/client')
-  // load latest content script
-  import('./contentScriptHMR')
-}
+// if (__DEV__) {
+//   // load latest content script
+//   import('./contentScriptHMR')
+// }
+
+import('./contentScriptHMR')
 
 browser.runtime.onInstalled.addListener((): void => {
   // eslint-disable-next-line no-console
@@ -74,7 +75,8 @@ onMessage('get-current-tab', async () => {
 /**
  * Reaction on click popup icon
  */
-browser.browserAction.onClicked.addListener(async (tab) => {
+browser.action.onClicked.addListener(async (tab) => {
+  console.log(tab)
   if (!tab.id) {
     return
   }

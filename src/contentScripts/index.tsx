@@ -10,9 +10,7 @@ import { render } from 'react-dom'
 
   // communication example: send previous tab title from background page
   onMessage('tab-prev', ({ data }) => {
-    if (__DEV__) {
-      console.log(`[Repo Stack] Navigate from page "${data.title}"`)
-    }
+    console.log(`[Repo Stack] Navigate from page "${data.title}"`)
   })
 
   // mount component to context window

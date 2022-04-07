@@ -1,4 +1,4 @@
-import { $fetch } from 'ohmyfetch'
+// import { $fetch } from 'ohmyfetch'
 import type { PackageJson } from 'type-fest'
 
 import { GITHUB_RAW_PREFIX, NPM_REGISTRY_PREFIX } from '../constants'
@@ -10,11 +10,9 @@ type GetPkgJsonOptions = {
 /**
  * @description Fetch github repo detail.
  */
-export const getPkgJson = async ({ fullName }: GetPkgJsonOptions) => {
-  const pkg: PackageJson = await $fetch(`${GITHUB_RAW_PREFIX}${fullName}/master/package.json`, {
-    parseResponse: JSON.parse,
-  })
-  return pkg
+export const getPkgJson = async ({ fullName }: GetPkgJsonOptions): Promise<PackageJson> => {
+  const pkg = await fetch(`${GITHUB_RAW_PREFIX}${fullName}/master/package.json`)
+  return pkg.json()
 }
 
 export type FetchPkgDetailOptions = {
@@ -26,7 +24,7 @@ export type PkgManifest = {
   name: string
 }
 
-export const fetchPkgDetail = async ({ name }: FetchPkgDetailOptions) => {
-  const pkg: PkgManifest = await $fetch(`${NPM_REGISTRY_PREFIX}${name}`)
-  return pkg
+export const fetchPkgDetail = async ({ name }: FetchPkgDetailOptions): Promise<PkgManifest> => {
+  const pkg = await fetch(`${NPM_REGISTRY_PREFIX}${name}`)
+  return pkg.json()
 }
