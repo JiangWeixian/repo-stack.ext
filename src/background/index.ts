@@ -1,17 +1,17 @@
-// FIXME: bundle fetch is not working
 import { sendMessage, onMessage } from 'webext-bridge'
 import browser, { Tabs } from 'webextension-polyfill'
 
 import { REQUEST_NPM_DETAIL, TOGGLE_MODAL } from '~/logic/constants'
 import { fetchPkgDetail, FetchPkgDetailOptions } from '~/logic/api'
 
+// FIXME: hmr not working on manifest v3
 // only on dev mode
-if (import.meta.hot) {
-  // TODO: fixme HMR not working
-  // import('/@vite/client')
-  // load latest content script
-  import('./contentScriptHMR')
-}
+// if (__DEV__) {
+//   // load latest content script
+//   import('./contentScriptHMR')
+// }
+
+import('./contentScriptHMR')
 
 browser.runtime.onInstalled.addListener((): void => {
   // eslint-disable-next-line no-console
