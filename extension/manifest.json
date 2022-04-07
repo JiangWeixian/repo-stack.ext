@@ -33,6 +33,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self' http://localhost:3303; object-src 'self' http://localhost:3303"
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }
