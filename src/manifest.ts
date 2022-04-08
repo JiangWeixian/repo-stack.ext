@@ -29,7 +29,6 @@ export async function getManifest() {
       128: './assets/icon-512.png',
     },
     host_permissions: ['http://*/', 'https://*/'],
-    permissions: ['tabs', 'activeTab'],
     content_scripts: [
       {
         matches: ['https://github.com/*'],
