@@ -23,6 +23,7 @@ async function stubIndexHtml() {
       )
       .replace('<div id="root"></div>', '<div id="root">Vite server did not start</div>')
     await fs.writeFile(r(`extension/dist/${view}/index.html`), data, 'utf-8')
+    console.log('')
     log('PRE', `stub ${view}`)
   }
 }
