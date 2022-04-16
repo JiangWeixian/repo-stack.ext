@@ -31,7 +31,7 @@ export type RepoFilesResponse = {
   path: string
 }[]
 
-const ignore = ['node_modules', 'examples', 'docs', 'fixtures']
+const ignore = ['node_modules/', 'examples/', 'docs/', 'fixtures/', 'test/']
 
 /**
  * @description list repo files list

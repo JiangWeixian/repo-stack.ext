@@ -3,11 +3,11 @@ import { onMessage, sendMessage } from 'webext-bridge'
 import cx from 'clsx'
 import type { PackageJson } from 'type-fest'
 import { GitUrl } from 'git-url-parse'
-import { pickBy } from 'lodash-es'
+import { pickBy, sortBy } from 'lodash-es'
 
 import '../../styles/main.css'
 import { REQUEST_NPM_DETAIL, TOGGLE_MODAL } from '~/logic/constants'
-import { resolveRepo } from '~/logic/resolve'
+import { resolveRepo, findUpPackage } from '~/logic/resolve'
 import {
   getPkgJson,
   FetchPkgDetailOptions,
@@ -39,7 +39,7 @@ const useClickOutside = (ref: any, callback: any) => {
 export const App = () => {
   const modal = useRef<HTMLDivElement>(null)
   // current package.json filepath
-  const [currentPackageJson, setCurrentPackageJson] = useState('package.json')
+  const [currentPackageJson, setCurrentPackageJson] = useState('')
   const [defaultBranch, setDefaultBranch] = useState('master')
   const [packageJsons, setPackageJsons] = useState<RepoFilesResponse>()
   const [repo, setRepo] = useState<GitUrl>()
@@ -58,6 +58,7 @@ export const App = () => {
     setSelected(name)
   }
   const handleFetchPkgJson = useCallback((options: GetPkgJsonOptions) => {
+    setCurrentPackageJson(options.pkgPath || 'package.json')
     getPkgJson(options).then((res) => {
       const dependencies = pickBy(Object.assign(res.dependencies || {}), (_value, key) => {
         // @types/
@@ -93,12 +94,19 @@ export const App = () => {
     const detail = resolveRepo(window.location.href)
     setRepo(detail)
     if (open) {
-      fetchRepoBranches({ fullName: detail.full_name }).then((res) => {
-        setDefaultBranch(res?.name || 'master')
-        fetchRepoPkgFiles({ fullName: detail.full_name, branch: res?.name }).then((res) => {
-          setPackageJsons(res)
-        })
-        handleFetchPkgJson({ fullName: detail.full_name, branch: res?.name })
+      fetchRepoBranches({ fullName: detail.full_name }).then(async (branchRes) => {
+        setDefaultBranch(branchRes?.name || 'master')
+        fetchRepoPkgFiles({ fullName: detail.full_name, branch: branchRes?.name }).then(
+          (fileRes) => {
+            const nearestPackage = findUpPackage(detail.filepath, fileRes || [])
+            setPackageJsons(fileRes)
+            handleFetchPkgJson({
+              fullName: detail.full_name,
+              branch: branchRes?.name,
+              pkgPath: nearestPackage?.path,
+            })
+          },
+        )
       })
     }
   }, [handleFetchPkgJson, open])
@@ -148,7 +156,7 @@ export const App = () => {
               tabIndex={0}
               className="dropdown-content menu p-2 shadow bg-base-100 rounded-box max-h-52 overflow-auto"
             >
-              {packageJsons?.map((p) => {
+              {sortBy(packageJsons, (p) => p.path.length)?.map((p) => {
                 return (
                   <li
                     onClick={() => {
@@ -157,7 +165,6 @@ export const App = () => {
                         branch: defaultBranch,
                         pkgPath: p.path,
                       })
-                      setCurrentPackageJson(p.path)
                     }}
                     key={p.path}
                   >
