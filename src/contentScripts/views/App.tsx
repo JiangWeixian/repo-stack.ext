@@ -3,7 +3,7 @@ import { onMessage, sendMessage } from 'webext-bridge'
 import cx from 'clsx'
 import type { PackageJson } from 'type-fest'
 import { GitUrl } from 'git-url-parse'
-import { pickBy, find } from 'lodash-es'
+import { pickBy } from 'lodash-es'
 
 import '../../styles/main.css'
 import { REQUEST_NPM_DETAIL, TOGGLE_MODAL } from '~/logic/constants'
@@ -34,7 +34,6 @@ const useClickOutside = (ref: any, callback: any) => {
 }
 
 /**
- * @todo group pkgs to dep and devdeps
  * @todo support private repo(need github token)
  */
 export const App = () => {
@@ -46,7 +45,10 @@ export const App = () => {
   const [repo, setRepo] = useState<GitUrl>()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [deps, setDeps] = useState<NonNullable<PackageJson['dependencies']>>({})
+  const [deps, setDeps] = useState<{
+    dependencies: NonNullable<PackageJson['dependencies']>
+    devDependencies: NonNullable<PackageJson['dependencies']>
+  }>({ dependencies: {}, devDependencies: {} })
   const [readme, setReadme] = useState<Record<string, string>>({})
   const [selected, setSelected] = useState('')
   const selectedReadme = useMemo(() => {
@@ -57,15 +59,17 @@ export const App = () => {
   }
   const handleFetchPkgJson = useCallback((options: GetPkgJsonOptions) => {
     getPkgJson(options).then((res) => {
-      const deps = pickBy(
-        Object.assign({}, res.dependencies || {}, res.devDependencies || {}),
-        (_value, key) => {
-          // @types/
-          return !key.startsWith('@types/')
-        },
-      )
+      const dependencies = pickBy(Object.assign(res.dependencies || {}), (_value, key) => {
+        // @types/
+        return !key.startsWith('@types/')
+      })
+      const devDependencies = pickBy(Object.assign(res.devDependencies || {}), (_value, key) => {
+        // @types/
+        return !key.startsWith('@types/')
+      })
+      const deps = { dependencies, devDependencies }
       setDeps(deps)
-      const defaultPkg = Object.keys(deps)[0]
+      const defaultPkg = Object.keys(dependencies)[0] || Object.keys(devDependencies)[0]
       setSelected(defaultPkg)
     })
   }, [])
@@ -90,14 +94,11 @@ export const App = () => {
     setRepo(detail)
     if (open) {
       fetchRepoBranches({ fullName: detail.full_name }).then((res) => {
-        const defaultBranch = find(res, (b) => b.protected)
-        setDefaultBranch(defaultBranch?.name || 'master')
-        fetchRepoPkgFiles({ fullName: detail.full_name, branch: defaultBranch?.name }).then(
-          (res) => {
-            setPackageJsons(res)
-          },
-        )
-        handleFetchPkgJson({ fullName: detail.full_name, branch: defaultBranch?.name })
+        setDefaultBranch(res?.name || 'master')
+        fetchRepoPkgFiles({ fullName: detail.full_name, branch: res?.name }).then((res) => {
+          setPackageJsons(res)
+        })
+        handleFetchPkgJson({ fullName: detail.full_name, branch: res?.name })
       })
     }
   }, [handleFetchPkgJson, open])
@@ -168,17 +169,42 @@ export const App = () => {
           </div>
         </div>
         <div className="divider mb-0 -mx-6" />
-        <div className="flex h-full overflow-hidden">
-          <ul className="menu menu-compact bg-base-100 w-56 p-2 rounded-box h-full overflow-y-auto">
-            {Object.keys(deps).map((name) => {
-              return (
-                <li onClick={() => handleFetchPkgDetail({ name })} key={name}>
-                  <a className={cx({ active: selected === name })}>{name}</a>
-                </li>
-              )
-            })}
-          </ul>
-          <div className="flex justify-center items-center bg-base-100 h-full w-full overflow-y-auto py-2 px-4">
+        <div className="flex h-full overflow-y-hidden">
+          <div className="flex flex-0 flex-col h-full w-64 overflow-y-auto">
+            <ul className="menu bg-base-100 mx-2 rounded-box">
+              <li className="menu-title">
+                <span>dependencies</span>
+              </li>
+              {Object.keys(deps.dependencies).map((name) => {
+                return (
+                  <li
+                    className={cx({ bordered: selected === name })}
+                    onClick={() => handleFetchPkgDetail({ name })}
+                    key={name}
+                  >
+                    <a>{name}</a>
+                  </li>
+                )
+              })}
+            </ul>
+            <ul className="menu bg-base-100 mx-2 rounded-box">
+              <li className="menu-title">
+                <span>devDependencies</span>
+              </li>
+              {Object.keys(deps.devDependencies).map((name) => {
+                return (
+                  <li
+                    className={cx({ bordered: selected === name })}
+                    onClick={() => handleFetchPkgDetail({ name })}
+                    key={name}
+                  >
+                    <a>{name}</a>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+          <div className="flex flex-1 justify-center items-center bg-base-100 h-full overflow-y-auto py-2 px-4">
             {loading ? <i className="gg-spinner" /> : renderReadme()}
           </div>
         </div>
