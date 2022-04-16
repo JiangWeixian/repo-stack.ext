@@ -1,18 +1,61 @@
-// import { $fetch } from 'ohmyfetch'
 import type { PackageJson } from 'type-fest'
 
-import { GITHUB_RAW_PREFIX, NPM_REGISTRY_PREFIX } from '../constants'
+import { GITHUB_RAW_PREFIX, GITHUB_REST_PREFIX, NPM_REGISTRY_PREFIX } from '../constants'
 
-type GetPkgJsonOptions = {
+export type GetPkgJsonOptions = {
   fullName: string
+  branch?: string
+  pkgPath?: string
 }
 
 /**
  * @description Fetch github repo detail.
  */
-export const getPkgJson = async ({ fullName }: GetPkgJsonOptions): Promise<PackageJson> => {
-  const pkg = await fetch(`${GITHUB_RAW_PREFIX}${fullName}/master/package.json`)
+export const getPkgJson = async ({
+  fullName,
+  branch = 'master',
+  pkgPath = 'package.json',
+}: GetPkgJsonOptions): Promise<PackageJson> => {
+  const pkg = await fetch(`${GITHUB_RAW_PREFIX}${fullName}/${branch}/${pkgPath}`)
   return pkg.json()
+}
+
+type RawRepoFilesResponse = {
+  tree: {
+    path: string
+  }[]
+}
+
+export type RepoFilesResponse = {
+  path: string
+}[]
+
+/**
+ * @description list repo files list
+ * @see {@link https://gist.github.com/MichaelCurrin/6777b91e6374cdb5662b64b8249070ea}
+ */
+export const fetchRepoPkgFiles = async ({
+  fullName,
+  branch = 'master',
+}: GetPkgJsonOptions): Promise<RepoFilesResponse> => {
+  // https://api.github.com/repos/vitest-dev/vitest/git/trees/main?recursive=1
+  const result = await fetch(
+    `${GITHUB_REST_PREFIX}repos/${fullName}/git/trees/${branch}?recursive=1`,
+  )
+  const packages: RawRepoFilesResponse = await result.json()
+  return packages.tree.filter((p) => p.path.includes('package.json'))
+}
+
+export type RepoBranchesResponse = {
+  name: string
+  protected: boolean
+}[]
+
+export const fetchRepoBranches = async ({
+  fullName,
+}: GetPkgJsonOptions): Promise<RepoBranchesResponse> => {
+  const result = await fetch(`${GITHUB_REST_PREFIX}repos/${fullName}/branches`)
+  return result.json()
 }
 
 export type FetchPkgDetailOptions = {
