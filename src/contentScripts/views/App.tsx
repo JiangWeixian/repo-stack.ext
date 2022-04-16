@@ -70,21 +70,13 @@ export const App = () => {
     })
   }, [])
   useEffect(() => {
+    if (!open) {
+      return
+    }
     setLoading(true)
     sendMessage(REQUEST_NPM_DETAIL, { name: selected })
-  }, [selected])
+  }, [selected, open])
   useEffect(() => {
-    const detail = resolveRepo(window.location.href)
-    setRepo(detail)
-    fetchRepoBranches({ fullName: detail.full_name }).then((res) => {
-      const defaultBranch = find(res, (b) => b.protected)
-      setDefaultBranch(defaultBranch?.name || 'master')
-      fetchRepoPkgFiles({ fullName: detail.full_name, branch: defaultBranch?.name }).then((res) => {
-        setPackageJsons(res)
-      })
-      handleFetchPkgJson({ fullName: detail.full_name, branch: defaultBranch?.name })
-    })
-
     onMessage(TOGGLE_MODAL, () => {
       setOpen((prev) => !prev)
     })
@@ -92,7 +84,23 @@ export const App = () => {
       setLoading(false)
       setReadme((prev) => ({ ...prev, [data.name]: data.readme }))
     })
-  }, [handleFetchPkgJson])
+  }, [])
+  useEffect(() => {
+    const detail = resolveRepo(window.location.href)
+    setRepo(detail)
+    if (open) {
+      fetchRepoBranches({ fullName: detail.full_name }).then((res) => {
+        const defaultBranch = find(res, (b) => b.protected)
+        setDefaultBranch(defaultBranch?.name || 'master')
+        fetchRepoPkgFiles({ fullName: detail.full_name, branch: defaultBranch?.name }).then(
+          (res) => {
+            setPackageJsons(res)
+          },
+        )
+        handleFetchPkgJson({ fullName: detail.full_name, branch: defaultBranch?.name })
+      })
+    }
+  }, [handleFetchPkgJson, open])
   useClickOutside(modal, function () {
     setOpen(false)
   })
