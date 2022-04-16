@@ -1,4 +1,5 @@
 import type { PackageJson } from 'type-fest'
+import { find } from 'lodash-es'
 
 import { GITHUB_RAW_PREFIX, GITHUB_REST_PREFIX, NPM_REGISTRY_PREFIX } from '../constants'
 
@@ -30,6 +31,8 @@ export type RepoFilesResponse = {
   path: string
 }[]
 
+const ignore = ['node_modules', 'examples', 'docs', 'fixtures']
+
 /**
  * @description list repo files list
  * @see {@link https://gist.github.com/MichaelCurrin/6777b91e6374cdb5662b64b8249070ea}
@@ -43,19 +46,31 @@ export const fetchRepoPkgFiles = async ({
     `${GITHUB_REST_PREFIX}repos/${fullName}/git/trees/${branch}?recursive=1`,
   )
   const packages: RawRepoFilesResponse = await result.json()
-  return packages.tree.filter((p) => p.path.includes('package.json'))
+  return packages.tree.filter(
+    (p) => p.path.includes('package.json') && ignore.every((i) => !p.path.includes(i)),
+  )
 }
 
-export type RepoBranchesResponse = {
+export type RawRepoBranchesResponse = {
   name: string
   protected: boolean
 }[]
 
+export type RepoBranchesResponse = {
+  name: string
+  protected: boolean
+}
+
+/**
+ * @description only get protected branch
+ */
 export const fetchRepoBranches = async ({
   fullName,
-}: GetPkgJsonOptions): Promise<RepoBranchesResponse> => {
-  const result = await fetch(`${GITHUB_REST_PREFIX}repos/${fullName}/branches`)
-  return result.json()
+}: GetPkgJsonOptions): Promise<RepoBranchesResponse | undefined> => {
+  const result = await fetch(`${GITHUB_REST_PREFIX}repos/${fullName}/branches?protected=true`)
+  const branches: RawRepoBranchesResponse = await result.json()
+  const defaultBranch = find(branches, (b) => b.protected)
+  return defaultBranch
 }
 
 export type FetchPkgDetailOptions = {
