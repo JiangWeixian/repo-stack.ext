@@ -95,7 +95,7 @@ export const App = () => {
     setRepo(detail)
     if (open) {
       fetchRepoBranches({ fullName: detail.full_name }).then(async (branchRes) => {
-        setDefaultBranch(branchRes?.name || 'master')
+        setDefaultBranch(branchRes.name)
         fetchRepoPkgFiles({ fullName: detail.full_name, branch: branchRes?.name }).then(
           (fileRes) => {
             const nearestPackage = findUpPackage(detail.filepath, fileRes || [])
