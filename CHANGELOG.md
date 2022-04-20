@@ -1,5 +1,12 @@
 # repo-stack.ext
 
+## 0.1.1
+
+### Patch Changes
+
+- f68af52: fix loading status on empty pkg
+- fb260c9: fix fetch failed on protected branch undefined repo
+
 ## 0.1.0
 
 ### Minor Changes
