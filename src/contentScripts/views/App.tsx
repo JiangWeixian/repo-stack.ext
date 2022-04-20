@@ -44,7 +44,7 @@ export const App = () => {
   const [packageJsons, setPackageJsons] = useState<RepoFilesResponse>()
   const [repo, setRepo] = useState<GitUrl>()
   const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [deps, setDeps] = useState<{
     dependencies: NonNullable<PackageJson['dependencies']>
     devDependencies: NonNullable<PackageJson['dependencies']>
@@ -75,7 +75,7 @@ export const App = () => {
     })
   }, [])
   useEffect(() => {
-    if (!open) {
+    if (!open || !selected) {
       return
     }
     setLoading(true)
