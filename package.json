@@ -1,7 +1,7 @@
 {
   "name": "repo-stack.ext",
   "displayName": "Repo Stack",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Display repo stack details",
   "keywords": [
     "repo stack",
