@@ -58,7 +58,7 @@ export type RawRepoBranchesResponse = {
 
 export type RepoBranchesResponse = {
   name: string
-  protected: boolean
+  protected?: boolean
 }
 
 /**
@@ -66,11 +66,16 @@ export type RepoBranchesResponse = {
  */
 export const fetchRepoBranches = async ({
   fullName,
-}: GetPkgJsonOptions): Promise<RepoBranchesResponse | undefined> => {
-  const result = await fetch(`${GITHUB_REST_PREFIX}repos/${fullName}/branches?protected=true`)
+}: GetPkgJsonOptions): Promise<RepoBranchesResponse> => {
+  const result = await fetch(`${GITHUB_REST_PREFIX}repos/${fullName}/branches`)
   const branches: RawRepoBranchesResponse = await result.json()
-  const defaultBranch = find(branches, (b) => b.protected)
-  return defaultBranch
+  /**
+   * Perfer protected branch > master > main
+   */
+  const defaultBranch =
+    find(branches, (b) => b.protected) ||
+    find(branches, (b) => b.name === 'master' || b.name === 'main')
+  return defaultBranch || { name: 'master' }
 }
 
 export type FetchPkgDetailOptions = {
