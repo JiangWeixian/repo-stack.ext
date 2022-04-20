@@ -31,7 +31,7 @@ export type RepoFilesResponse = {
   path: string
 }[]
 
-const ignore = ['node_modules/', 'examples/', 'docs/', 'fixtures/', 'test/']
+const ignore = [/node_modules\//, /examples\//, /fixtures\//, /^test\/|\/test\//]
 
 /**
  * @description list repo files list
@@ -47,7 +47,7 @@ export const fetchRepoPkgFiles = async ({
   )
   const packages: RawRepoFilesResponse = await result.json()
   return packages.tree.filter(
-    (p) => p.path.includes('package.json') && ignore.every((i) => !p.path.includes(i)),
+    (p) => p.path.includes('package.json') && ignore.every((i) => !p.path.match(i)),
   )
 }
 
