@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { onMessage, sendMessage } from 'webext-bridge'
 import cx from 'clsx'
 import type { PackageJson } from 'type-fest'
@@ -56,10 +56,12 @@ export const App = () => {
   }, [selected, readme])
   const handleFetchPkgDetail = async ({ name }: FetchPkgDetailOptions) => {
     setSelected(name)
+    setLoading(true)
+    sendMessage(REQUEST_NPM_DETAIL, { name })
   }
-  const handleFetchPkgJson = useCallback((options: GetPkgJsonOptions) => {
+  const handleFetchPkgJson = useCallback(async (options: GetPkgJsonOptions) => {
     setCurrentPackageJson(options.pkgPath || 'package.json')
-    getPkgJson(options).then((res) => {
+    return getPkgJson(options).then((res) => {
       const dependencies = pickBy(Object.assign(res.dependencies || {}), (_value, key) => {
         // @types/
         return !key.startsWith('@types/')
@@ -72,6 +74,7 @@ export const App = () => {
       setDeps(deps)
       const defaultPkg = Object.keys(dependencies)[0] || Object.keys(devDependencies)[0]
       setSelected(defaultPkg)
+      return defaultPkg
     })
   }, [])
   useEffect(() => {
@@ -81,7 +84,7 @@ export const App = () => {
     setLoading(true)
     sendMessage(REQUEST_NPM_DETAIL, { name: selected })
   }, [selected, open])
-  useEffect(() => {
+  useLayoutEffect(() => {
     onMessage(TOGGLE_MODAL, () => {
       setOpen((prev) => !prev)
     })
@@ -97,14 +100,17 @@ export const App = () => {
       fetchRepoBranches({ fullName: detail.full_name }).then(async (branchRes) => {
         setDefaultBranch(branchRes.name)
         fetchRepoPkgFiles({ fullName: detail.full_name, branch: branchRes?.name }).then(
-          (fileRes) => {
+          async (fileRes) => {
             const nearestPackage = findUpPackage(detail.filepath, fileRes || [])
             setPackageJsons(fileRes)
-            handleFetchPkgJson({
+            const defaultPkg = await handleFetchPkgJson({
               fullName: detail.full_name,
               branch: branchRes?.name,
               pkgPath: nearestPackage?.path,
             })
+            if (defaultPkg) {
+              await handleFetchPkgDetail({ name: defaultPkg })
+            }
           },
         )
       })
