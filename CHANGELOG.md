@@ -1,5 +1,11 @@
 # repo-stack.ext
 
+## 0.1.2
+
+### Patch Changes
+
+- f595fa9: fix loading status on empty pkg
+
 ## 0.1.1
 
 ### Patch Changes
