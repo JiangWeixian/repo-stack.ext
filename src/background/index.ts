@@ -43,40 +43,31 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
 /**
  * @description request npm package detail
  */
-onMessage<FetchPkgDetailOptions, string>(REQUEST_NPM_DETAIL, async ({ data }) => {
-  try {
-    const tab = await browser.tabs.get(previousTabId)
-    if (!tab.id || !data?.name) {
+onMessage<FetchPkgDetailOptions & { tabId: number }, string>(
+  REQUEST_NPM_DETAIL,
+  async ({ data }) => {
+    try {
+      console.log('received', data)
+      if (!data.tabId || !data?.name) {
+        return {}
+      }
+      const detail = await fetchPkgDetail({ name: data.name })
+      sendMessage(REQUEST_NPM_DETAIL, detail, { context: 'content-script', tabId: data.tabId })
+      return detail
+    } catch (e) {
+      console.log(e)
       return {}
     }
-    const detail = await fetchPkgDetail({ name: data.name })
-    sendMessage(REQUEST_NPM_DETAIL, detail, { context: 'content-script', tabId: tab.id })
-    return detail
-  } catch {
-    return {}
-  }
-})
-
-onMessage('get-current-tab', async () => {
-  try {
-    const tab = await browser.tabs.get(previousTabId)
-    return {
-      title: tab?.id,
-    }
-  } catch {
-    return {
-      title: undefined,
-    }
-  }
-})
+  },
+)
 
 /**
  * Reaction on click popup icon
  */
 browser.action.onClicked.addListener(async (tab) => {
-  console.log(tab)
+  console.log('click popup icon')
   if (!tab.id) {
     return
   }
-  sendMessage(TOGGLE_MODAL, {}, { context: 'content-script', tabId: tab.id })
+  sendMessage(TOGGLE_MODAL, { tabId: tab.id }, { context: 'content-script', tabId: tab.id })
 })

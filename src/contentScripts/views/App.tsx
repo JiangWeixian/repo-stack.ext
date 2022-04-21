@@ -18,7 +18,6 @@ import {
   GetPkgJsonOptions,
 } from '~/logic/api'
 import { md } from '~/logic/md'
-
 const useClickOutside = (ref: any, callback: any) => {
   const handleClick = (e: any) => {
     if (ref.current && !ref.current.contains(e.target)) {
@@ -40,6 +39,7 @@ export const App = () => {
   const modal = useRef<HTMLDivElement>(null)
   // current package.json filepath
   const [currentPackageJson, setCurrentPackageJson] = useState('')
+  const [tabId, setTabId] = useState<number>()
   const [defaultBranch, setDefaultBranch] = useState('master')
   const [packageJsons, setPackageJsons] = useState<RepoFilesResponse>()
   const [repo, setRepo] = useState<GitUrl>()
@@ -54,11 +54,14 @@ export const App = () => {
   const selectedReadme = useMemo(() => {
     return readme[selected]
   }, [selected, readme])
-  const handleFetchPkgDetail = async ({ name }: FetchPkgDetailOptions) => {
-    setSelected(name)
-    setLoading(true)
-    sendMessage(REQUEST_NPM_DETAIL, { name })
-  }
+  const handleFetchPkgDetail = useCallback(
+    async ({ name }: FetchPkgDetailOptions) => {
+      setSelected(name)
+      setLoading(true)
+      sendMessage(REQUEST_NPM_DETAIL, { name, tabId })
+    },
+    [tabId],
+  )
   const handleFetchPkgJson = useCallback(async (options: GetPkgJsonOptions) => {
     setCurrentPackageJson(options.pkgPath || 'package.json')
     return getPkgJson(options).then((res) => {
@@ -77,15 +80,9 @@ export const App = () => {
       return defaultPkg
     })
   }, [])
-  useEffect(() => {
-    if (!open || !selected) {
-      return
-    }
-    setLoading(true)
-    sendMessage(REQUEST_NPM_DETAIL, { name: selected })
-  }, [selected, open])
   useLayoutEffect(() => {
-    onMessage(TOGGLE_MODAL, () => {
+    onMessage<{ tabId: number }, string>(TOGGLE_MODAL, ({ data }) => {
+      setTabId(data.tabId)
       setOpen((prev) => !prev)
     })
     onMessage<PkgManifest, string>(REQUEST_NPM_DETAIL, ({ data }) => {
@@ -115,7 +112,7 @@ export const App = () => {
         )
       })
     }
-  }, [handleFetchPkgJson, open])
+  }, [handleFetchPkgDetail, handleFetchPkgJson, open])
   useClickOutside(modal, function () {
     setOpen(false)
   })
