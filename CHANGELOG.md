@@ -1,5 +1,11 @@
 # repo-stack.ext
 
+## 0.1.2
+
+### Patch Changes
+
+- 15efd99: fix disconnect with background
+
 ## 0.1.1
 
 ### Patch Changes
